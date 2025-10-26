@@ -10,7 +10,6 @@ import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 import copy from 'rollup-plugin-copy'
 
-
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
@@ -26,13 +25,10 @@ export default {
 		output: config.client.output(),
 		plugins: [
 			copy({
-				targets: [{
-					src: 'node_modules/bootstrap/dist/**/*',
-					dest: 'static/vendor/bootstrap'
-				},{
-					src: 'node_modules/jquery/dist/**/*',
-					dest: 'static/vendor/jquery'
-				}]
+				targets: [
+					{ src: 'node_modules/bootstrap/dist/**/*', dest: 'static/vendor/bootstrap' },
+					{ src: 'node_modules/jquery/dist/**/*', dest: 'static/vendor/jquery' }
+				]
 			}),
 			replace({
 				preventAssignment: true,

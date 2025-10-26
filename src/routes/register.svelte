@@ -1,6 +1,6 @@
 <script>
 	import { goto, stores } from '@sapper/app';
-	import { post } from '../node_modules/api.js';
+	import { post } from 'api.js';
 
 	const { session } = stores();
 
@@ -10,10 +10,11 @@
 	let error = null;
 
 	async function submit(event) {
-        const response = await post('users', { username, name, password });        error = response.error;
+        const response = await post('users', { username, name, password });        
+        error = response.error;
 
-        if (response.id) {
-            $session.user = response.user;
+        if (response.user) {
+            session.set({ user: response.user });
             goto('/');
         }
     }
@@ -21,7 +22,7 @@
 </script>
 
 <svelte:head>
-	<title>Sign up • Conduit</title>
+	<title>Sign up • BarBank</title>
 </svelte:head>
 
 <div class="auth-page">
