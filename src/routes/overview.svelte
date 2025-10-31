@@ -1,10 +1,3 @@
-<script context="module">
-    export async function preload({params}, {token}) {
-        if (!token) {
-            this.redirect(302, '/login');
-        }
-    }
-</script>
 <script>
     import { post } from 'utils.js';
 
@@ -16,8 +9,13 @@
             return r;
         });
     }
+
     async function getTransactions() {
         return await post(`auth/getTransactions`);
+    }
+    function wordhighlighting(text) {
+        if (!text) return '';
+        return text.replace(/[aAаА]/g, '<span style="color: orange;">$&</span>');
     }
 </script>
 
@@ -26,12 +24,16 @@
         Loading...
     {:then my}
         <section>
-            <p style="font-size: xx-large">{my.name}</p>
+            <p style="font-size: xx-large">
+                {my.name} 
+                ({my.id}, {my.firstName} {my.lastName}, {my.email}, {my.permissionLevel})
+            </p>
         </section>
         <section>
             My funds
             <p style="font-size: xx-large; color:{my.funds >= 0 ? 'green' : 'red'}">{my.funds}</p>
         </section>
+
         <section>
             <ul>
                 {#each my.accounts as account}
@@ -39,31 +41,36 @@
                 {/each}
             </ul>
         </section>
+
         <section>
             {#await getTransactions()}
-            Loading...
+                Loading...
             {:then transactions}
                 <table class="table table-striped table-bordered">
                     <thead>
-                    <tr>
-                        <th>SenderName</th>
-                        <th>Amount</th>
-                        <th>CreatedAt</th>
-                        <th>Status</th>
-                    </tr>
+                        <tr>
+                            <th>SenderName</th>
+                            <th>Amount</th>
+                            <th>CreatedAt</th>
+                            <th>Status</th>
+                            <th>StatusDetail</th>
+                            <th>LoggedInUser</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {#each transactions as transaction}
-                        <tr>
-                            <td><b>{transaction.senderName}</b><br>{transaction.explanation}</td>
-                            <td style="color: {transaction.amount >= 0 ? 'green' : 'red'}">{transaction.amount} {transaction.currency}</td>
-                            <td>{transaction.createdAt}</td>
-                            <td><b>{transaction.status}</b><br>{transaction.statusDetail}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        {/await}
-    </section>
+                        {#each transactions as transaction}
+                            <tr>
+                                <td><b>{@html wordhighlighting(transaction.senderName)}</b><br>{@html wordhighlighting(transaction.explanation)}</td>
+                                <td style="color: {transaction.amount >= 0 ? 'green' : 'red'}">{transaction.amount} {transaction.currency}</td>
+                                <td>{@html wordhighlighting(transaction.createdAt)}</td>
+                                <td><b>{@html wordhighlighting(transaction.status)}</b><br>{@html wordhighlighting(transaction.statusDetail)}</td>
+                                <td>{@html wordhighlighting(transaction.statusDetail)}</td>
+                                <td>{@html wordhighlighting(transaction.loggedInUser)}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            {/await}
+        </section>
     {/await}
 {/if}
